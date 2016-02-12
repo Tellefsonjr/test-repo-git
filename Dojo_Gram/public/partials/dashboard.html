@@ -1,0 +1,45 @@
+<div ng-controller="PostController">
+<div>
+<h1>Hello, {{user.username}}!</h1>
+</div>
+
+
+<form>
+    <div>
+      <label for="post">Post:</label>
+      <input type="text" class="form-control" name="post" placeholder="ex: http:/website.com/image.img" ng-model="new_post.post">
+    </div>
+  <button type="button" class="btn btn-primary" ng-click='create_post()'>Post Image!</button>
+</form>
+
+<div>
+  <div ng-repeat='post in posts'>
+    <h3 ng-bind='post._user.username'></h3>
+      <hr>
+    <div>
+      <img ng-src="{{post.post}}" width="260px" height="380px">
+    </div>
+      <p><i>-{{post.created_at}}</i></p>
+      <hr>
+	       <button type="button" ng-click="show_comments(isCollapsed = !isCollapsed)">View Comments</button>
+	    <hr>
+	     <div uib-collapse="isCollapsed">
+            <div class="well well-sm" ng-repeat='comment in post.comments'>
+              <h4 ng-bind='comment._user.username'></h4>says:
+              <p ng-bind='comment.comment'></p>
+              <hr>
+            </div>
+            <form>
+              <div ng-controller="CommentController">
+                <label for="comment">Comment:</label>
+                <input type="text" id="text" ng-model='new_comment.comment'>
+                <button type="button" ng-click='create_comment(post._id)'>Comment!</button>
+              </div>
+            </form>
+        </div>
+	     </div>
+     </div>
+    </div>
+  </div>
+
+</div>

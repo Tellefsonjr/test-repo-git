@@ -1,0 +1,11 @@
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background: linear-gradient(to right, rgba(181, 185, 189, 0.40), rgba(9, 84, 159, 0.45), rgba(9, 84, 159, 0.45), rgba(181, 185, 189, 0.40));
+}
+
+a {
+  color: rgb(13, 51, 60);
+}
+a.hover{
+  color: rgb(0, 20, 26);
+}

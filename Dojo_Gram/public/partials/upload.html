@@ -1,0 +1,31 @@
+<div class="page-header">
+  <h1><span class="glyphicon glyphicon-save"></span> Upload a picture here:</h1>
+</div>
+  <form ng-submit="upload()"
+  ng-show="isLoggedIn()"
+  class="form-horizontal"
+  style="margin-top:30px;">
+  <h3>Add a new post</h3>
+
+  <div class="input-group">
+    <span class="input-group-addon"><i class="glyphicon glyphicon-console"></i></span>
+    <input type="text"
+    class="form-control"
+    placeholder="Title"
+    ng-model="title"></input>
+  </div>
+  <div class="input-group">
+    <span class="input-group-addon"><i class="glyphicon glyphicon-folder-open"></i></span>
+    <input type="text"
+    class="form-control"
+    placeholder="ex: www.website.com/image.jpg"
+    ng-model="img"></input>
+  </div>
+  <hr>
+  <input type="submit" class="btn btn-primary" name="post" value="Post!">
+  <!-- <div class="form-group">
+    <input type="file"
+    class="form-control"
+    ng-model="img"></input>
+  </div> -->
+</form>

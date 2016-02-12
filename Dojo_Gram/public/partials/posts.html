@@ -1,0 +1,42 @@
+  <div class="page-header">
+    <h3>
+      <span style="font-size:20px; margin-left:10px;">
+        <div class="well well-lg">
+          <img ng-src="{{post.img}}" class="img-responsive" />
+        <span ng-hide="post.link">
+          "{{post.title}}"
+        </span>
+        <span ng-show="post.author">
+          by <a href="/#/user/{{post._user}}.">{{post.author}}</a>
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <div ng-repeat="comment in post.comments | orderBy:'-upvotes'">
+    <div class="well">
+
+    <span class="glyphicon glyphicon-thumbs-up"
+      ng-click="incrementUpvotes(comment)"></span>
+    <span class="badge">{{comment.upvotes}}</span>
+    <span style="font-size:20px; margin-left:10px;">
+        "{{comment.body}}"
+    </span> - <a href="/#/user/{{comment._user}}">{{comment.author}}</a>
+  </div>
+  </div>
+  <div ng-hide="isLoggedIn()">
+  <h3>You need to <a href="/#/login">Log In</a> or <a href="/#/register">Register</a> before you can comment.</h3>
+  </div>
+  <form ng-submit="addComment()"
+    ng-show="isLoggedIn()"
+    style="margin-top:30px;">
+    <h3>Add a new comment</h3>
+
+    <div class="form-group">
+      <input type="text"
+      class="form-control"
+      placeholder="Comment"
+      ng-model="body"></input>
+    </div>
+    <button type="submit" class="btn btn-primary">Post</button>
+  </form>

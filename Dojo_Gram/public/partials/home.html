@@ -1,0 +1,15 @@
+
+<div ng-repeat="post in posts | orderBy:'-upvotes'">
+ <span style="font-size:20px">
+   <div class="well well-lg">
+    <a href="/#/posts/{{post._id}}"><img ng-src="{{post.img}}" class="img-responsive"></a></img>
+     "{{post.title}}"
+   <span ng-show="post.author">
+     by <a href="/#/user/{{post._user}}">{{post.author}}</a> |
+   </span>
+   <span style="padding:5px" class="glyphicon glyphicon-thumbs-up"
+   ng-click="incrementUpvotes(post)"></span>
+   <span class="badge">{{post.upvotes}}</span>
+</div>
+</span>
+</div>
