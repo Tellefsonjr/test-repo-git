@@ -1,4 +1,4 @@
-var app = angular.module('dojoGram', ["ui.router"]);
+var app = angular.module('dojoGram', ["ui.router", "ui.bootstrap"]);
 //Routing:::
 app.config([
 '$stateProvider',
@@ -22,9 +22,27 @@ function($stateProvider, $urlRouterProvider) {
     controller: 'ProfileCtrl',
     resolve: {
       post: ['$stateParams', 'members', function($stateParams, members){
-        console.log("IN PROFILE STATE", members);
-        console.log("STATEPARAM ID:", $stateParams.id);
         return members.getAllUserPosts($stateParams.id);
+      }]
+    }
+  })
+  .state('followers', {
+    url:'/user/{id}/followers',
+    templateUrl:'../partials/followers.html',
+    controller: 'ProfileCtrl',
+    resolve: {
+      post: ['$stateParams', 'members', function($stateParams, members){
+        return members.getFollowers($stateParams.id);
+      }]
+    }
+  })
+  .state('following', {
+    url:'/user/{id}/following',
+    templateUrl:'../partials/following.html',
+    controller: 'ProfileCtrl',
+    resolve: {
+      post: ['$stateParams', 'members', function($stateParams, members){
+        return members.getFollowing($stateParams.id);
       }]
     }
   })
@@ -48,6 +66,16 @@ function($stateProvider, $urlRouterProvider) {
       }]
     }
   })
+    .state('settings', {
+      url: '/user/{id}/settings',
+      templateUrl: '../partials/settings.html',
+      controller: 'ProfileCtrl',
+      resolve: {
+        post: ['$stateParams', 'members', function($stateParams, members){
+          return members.getAllUserPosts($stateParams.id);
+        }]
+      }
+    })
     .state('login', {
         url: '/login',
         templateUrl: '../partials/login.html',
@@ -139,7 +167,6 @@ app.factory('posts', ['$http', 'auth', function($http, auth){
  };
   o.get = function(id) {
     return $http.get('/posts/' + id).then(function(res){
-      console.log("Got to o.Get!!!");
       return res.data;
     });
   };
@@ -178,8 +205,15 @@ return o;
 //members Factory:::
 app.factory('members', ['$http', 'auth', function($http, auth){
   var o = {
-    posts: [{title: 'hello', upvotes:0}]
+    posts: [{title: 'hello', upvotes:0}],
+    users: []
   };
+  o.editProfile = function(user_repack) {
+    console.log("EDIT PROFILE USER:", user_repack);
+    return $http.patch('/user/' + user_repack._id + '/edit', user_repack).success(function(data){
+      headers: {Authorization: 'Bearer '+auth.getToken()}
+    })
+  }
   o.getAllUserPosts = function(id) {
     return $http.get('/user/' + id).success(function(data){
       console.log("Got to $HTTP in User Factory!!!", data);
@@ -187,12 +221,26 @@ app.factory('members', ['$http', 'auth', function($http, auth){
     });
   };
   o.followUser = function(id, follower){
-    console.log(id, follower);
     return $http.post('/user/' + id + '/follow/' + follower, {
       headers: {Authorization: 'Bearer '+auth.getToken()}
     });
   };
-  console.log("O:::", o.posts);
+  o.unfollowUser = function(id, follower){
+    console.log(id, follower);
+    return $http.post('/user/' + id + '/unfollow/' + follower, {
+      headers: {Authorization: 'Bearer '+auth.getToken()}
+    });
+  };
+  o.getFollowing = function(id){
+    return $http.get('/user/' + id + '/following').success(function(data){
+      angular.copy(data, o.users);
+    });
+  };
+  o.getFollowers = function(id){
+    return $http.get('/user/' + id + '/followers').success(function(data){
+      angular.copy(data, o.users);
+    });
+  };
 return o;
 }]);
 //Posts Controller:::
@@ -278,32 +326,42 @@ app.controller('ProfileCtrl', [
 'members',
 function($scope, $state, posts, post, auth, members){
   $scope.user = members.posts;
+  $scope.users = members.users;
   $scope.currentUser = auth.currentUser;
   $scope.posts = members.posts.posts;
   $scope.isLoggedIn = auth.isLoggedIn;
   $scope.currentUserID = auth.currentUserID;
-  $scope.addPost = function(){
-    if(!$scope.title || $scope.title === '') { return; }
-      var post_repack = {
-        title: $scope.title,
-        img: $scope.img,
-      };
-    posts.create(post_repack).then(function(){
-      $scope.posts.push(post_repack);
-      $state.reload('profile');
+
+  $scope.editProfile = function(user) {
+    console.log("UZOR:", user);
+    user_repack = {
+      _id: user._id,
+      username: user.newUsername,
+      bio: user.newBio,
+      password: user.newPassword,
+    };
+    console.log("USER_REPACK", user_repack);
+    members.editProfile(user_repack).success(function(data) {
+      console.log("EDIT PROFILE POST DATA:", data);
+      $scope.user = data.user;
     });
-    $scope.title = '';
-    $scope.img = '';
   };
-
-
   $scope.incrementUpvotes = function(post) {
     posts.upvote(post);
   };
   $scope.followUser = function(id, follower) {
-    members.followUser(id, follower);
-    console.log("Scope USER after follow:::", $scope.user);
-    $state.reload('profile');
+    members.followUser(id, follower).success(function(id, follower){
+      console.log("SCOPE USER FOLLOWING", $scope.user.following);
+      $scope.user.followers.push(follower);
+      $state.reload('profile');
+    });
+  };
+  $scope.unfollowUser = function(id, follower) {
+    members.unfollowUser(id, follower).success(function(id, follower){
+      $scope.user.followers = $scope.user.followers.filter(function(e){
+        $state.reload('profile');
+      });
+    });
   };
   $scope.isFollowing = function(){
     if($scope.user.followers.indexOf(auth.currentUserID()) === 0){
@@ -353,8 +411,6 @@ app.controller('AuthCtrl', [
 '$state',
 'auth',
 function($scope, $state, auth){
-  $scope.user = {};
-
   $scope.register = function(){
     auth.register($scope.user).error(function(error){
       $scope.error = error;

@@ -121,33 +121,59 @@ router.get('/user/:user', function(req, res, next) {
     res.json(posts);
   });
 });
+router.patch('/user/:user/edit', function(req, res, next) {
+  console.log('REQ BODY EDIT:', req.body);
+  User.findbyId(req.body._id).update({
+    username: req.body.username,
+    bio: req.body.password,
+  }).success(function(err, user){
+    if(err){ console.log("ERRRRRRRRRRRRRRRROR"); return next(err); }
+    return res.json(user);
+  });
+
+});
+router.get('/user/:user/following', function(req, res, next){
+  req.user.populate('following', function(err, users) {
+    if (err) {return next(err); }
+    console.log("FOLLOWING", users);
+    res.json(users);
+  });
+});
+router.get('/user/:user/followers', function(req, res, next){
+  req.user.populate('followers', function(err, users) {
+    if (err) {return next(err); }
+    console.log("FOLLOWERS:::", users);
+    res.json(users);
+  });
+});
 router.post('/user/:user/follow/:follower', function(req, res, next){
   console.log("Got to Follow Route!");
-  if (req.user.followers.indexOf(req.follower._id) === -1){
     req.user.followers.push(req.follower);
     req.follower.following.push(req.user);
     req.user.save(function(err, user){
-      if(err) { return next(err);}
+      if(err) { return next(err); }
       req.follower.save(function(err, user){
-        if(err) { return next(err);}
+        if(err) { console.log("ERROR FOLLOWING USER"); return next(err);}
+        res.json(user);
       });
     });
-  }
-  else {
+  });
+
+router.post('/user/:user/unfollow/:follower', function(req, res, next){
+    console.log("Got to UNfollow route!");
     req.user.followers = req.user.followers.filter(function(e) {
       req.follower.following = req.follower.following.filter(function(e) {
+        console.log("AFTER REQ USER:::", req.user);
         req.user.save(function(err, user){
           if(err) { return next(err);}
           req.follower.save(function(err, user){
-            if(err) { return next(err);}
+            if(err) { console.log("ERROR UNFOLLOWING USER"); return next(err);}
+            console.log("AFTER REQ:::", user);
+            res.json(user);
           });
-          console.log("AFTER REQ:::", req.params);
-          console.log("AFTER REQ USER:::", req.user);
         });
       });
     });
-  }
-  res.json(user);
   });
 //Update Comment with an UpVote:::
 router.put('/posts/:post/comments/:comment/upvote', auth, function(req, res, next) {

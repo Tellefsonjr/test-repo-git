@@ -1,0 +1,20 @@
+<div class="page-header">
+  <h3>
+    Followers:
+    <hr>
+    <div ng-show="users.followers.length == 0">
+      {{users.username}} doesn't have any followers yet :(
+    </div>
+    <span style="font-size:20px; margin-left:10px">
+      <div ng-repeat="follower in users.followers">
+        <div class="well well-sm">
+          <p style="padding:10px">
+            <b><a href="/#/user/{{follower._id}}">{{follower.username}} :</a></b>
+             Posts: <span class="badge">{{ follower.posts.length }}</span> |
+                  <a href="/#/user/{{follower._id}}/followers">Followers: </a><span class="badge">{{follower.followers.length}}</span> |
+                  Following: <span class="badge">{{follower.following.length}}</span>
+          </p>
+      </div>
+    </span>
+  </div>
+</div>

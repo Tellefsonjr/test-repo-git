@@ -1,12 +1,15 @@
   <h1>{{user.username}}'s profile:</h1>
+  <div ng-show="currentUser() == user.username" style="height:20px;width:100px">
+    <a href="/#/user/{{user._id}}/settings"><span class="glyphicon glyphicon-cog"></a> Settings</span>
+  </div>
+  <p>{{user.bio}}</p>
   <div class="dash-group page-header">
     <p>  <span class="dash-group-addon"><i class="glyphicon glyphicon-list"></i></span> Posts: <span class="badge">{{ posts.length }}</span> |
          <span class="dash-group-addon">
-           <!-- this should show + if not following and a - if following -->
-           <i ng-show="isFollowing()" class="glyphicon glyphicon-minus" ng-click="followUser(user._id, currentUserID())"></i></span>
+           <i ng-show="isFollowing()" class="glyphicon glyphicon-minus" ng-click="unfollowUser(user._id, currentUserID())"></i></span>
            <i ng-hide="isFollowing()" class="glyphicon glyphicon-plus" ng-click="followUser(user._id, currentUserID())"></i></span>
-            Followers: <span class="badge">{{user.followers.length}}</span> |
-         <span class="dash-group-addon"><i class="glyphicon glyphicon-heart"></i></span> Following: <span class="badge">{{user.following.length}}</span>
+            <a href="/#/user/{{user._id}}/followers">Followers: </a><span class="badge">{{user.followers.length}}</span> |
+         <span class="dash-group-addon"><i class="glyphicon glyphicon-heart"></i></span><a href="/#/user/{{user._id}}/following"> Following: </a><span class="badge">{{user.following.length}}</span>
     </p>
   </div>
 <div ng-hide="posts.length">

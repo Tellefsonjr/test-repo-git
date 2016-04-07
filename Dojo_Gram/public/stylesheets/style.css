@@ -9,3 +9,20 @@ a {
 a.hover{
   color: rgb(0, 20, 26);
 }
+nav{
+  -webkit-box-shadow: 2px 2px 5px #888888;
+  -moz-box-shadow: 2px 2px 5px #888888;
+  box-shadow: 2px 2px 5px #888888;
+}
+div.navbar-collapse.collapse {
+  display: block;
+  overflow: hidden;
+  max-height: 0px;
+  -webkit-transition: max-height .3s ease;
+  -moz-transition: max-height .3s ease;
+  -o-transition: max-height .3s ease;
+  transition: max-height .3s ease;
+}
+div.navbar-collapse.collapse.in {
+  max-height: 2000px;
+}
